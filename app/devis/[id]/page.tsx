@@ -1,4 +1,5 @@
 export const runtime = 'edge'
+// Rebuild trigger for Cloudflare
 
 'use client'
 
