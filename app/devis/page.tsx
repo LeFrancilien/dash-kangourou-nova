@@ -297,10 +297,12 @@ export default function DevisPage() {
                                             <div className="px-3 py-1 rounded-lg bg-gray-800 text-gray-300 text-xs font-medium">
                                                 J+{joursDepuisReception(d.date_reception)}
                                             </div>
-                                            <Link href={`/devis/${d.id}`}>
-                                                <button className="rounded-lg bg-orange-500 px-3 py-1 text-xs font-medium text-white hover:bg-orange-600 transition-colors">
-                                                    Voir
-                                                </button>
+                                            <Link
+                                                href={`/devis/details?id=${d.id}`}
+                                                className="h-8 w-8 flex items-center justify-center rounded-full bg-orange-500/10 text-orange-500 hover:bg-orange-500 hover:text-white transition-colors"
+                                                title="Voir le détail"
+                                            >
+                                                <ArrowRight className="h-4 w-4" />
                                             </Link>
                                         </div>
                                     </div>
