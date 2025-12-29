@@ -24,6 +24,7 @@ interface Devis {
     id: number
     numero_devis: string
     nom_client: string
+    prenom_client: string
     email_client: string
     telephone_client?: string
     montant?: number
@@ -266,17 +267,17 @@ export default function DevisDetailPage() {
 
     if (loading) {
         return (
-            <div className="flex h-screen items-center justify-center bg-[#0a0e1a]">
-                <div className="text-gray-400">Chargement...</div>
+            <div className="flex h-screen items-center justify-center">
+                <div className="text-muted-foreground">Chargement...</div>
             </div>
         )
     }
 
     if (!devis) {
         return (
-            <div className="flex h-screen items-center justify-center bg-[#0a0e1a]">
+            <div className="flex h-screen items-center justify-center">
                 <div className="text-center">
-                    <p className="text-gray-400 text-lg mb-4">Devis introuvable</p>
+                    <p className="text-muted-foreground text-lg mb-4">Devis introuvable</p>
                     <button onClick={() => router.push('/devis')} className="text-amber-500 hover:text-amber-400">
                         Retour
                     </button>
@@ -286,59 +287,59 @@ export default function DevisDetailPage() {
     }
 
     return (
-        <div className="flex-1 overflow-y-auto bg-[#0a0e1a] p-6">
+        <div className="flex-1 overflow-y-auto p-6">
             <div className="mx-auto max-w-5xl space-y-6">
                 <div className="flex items-center gap-4">
-                    <button onClick={() => router.push('/devis')} className="p-2 rounded-lg hover:bg-gray-800">
-                        <ArrowLeft className="h-5 w-5 text-gray-400" />
+                    <button onClick={() => router.push('/devis')} className="p-2 rounded-lg hover:bg-muted">
+                        <ArrowLeft className="h-5 w-5 text-muted-foreground" />
                     </button>
                     <div className="flex-1">
                         <div className="flex items-center gap-3">
-                            <h1 className="text-3xl font-bold text-white">{devis.nom_client}</h1>
+                            <h1 className="text-3xl font-bold text-foreground">{devis.nom_client}</h1>
                             {devis.contact_etabli && (
                                 <span className="px-3 py-1 rounded-full text-xs font-medium bg-green-500/20 text-green-500 border border-green-500/30">
                                     ✓ Contacté
                                 </span>
                             )}
                         </div>
-                        <p className="text-gray-400 mt-1">Devis {devis.numero_devis}</p>
+                        <p className="text-muted-foreground mt-1">Devis {devis.numero_devis}</p>
                     </div>
                 </div>
 
-                <Card className="bg-[#1a1f2e] border-gray-800">
+                <Card className="bg-card border-border">
                     <CardHeader>
-                        <CardTitle className="text-white">Informations</CardTitle>
+                        <CardTitle className="text-foreground">Informations</CardTitle>
                     </CardHeader>
                     <CardContent>
                         <div className="grid grid-cols-2 gap-4">
                             <div className="flex items-center gap-3">
                                 <FileText className="h-5 w-5 text-amber-500" />
                                 <div>
-                                    <p className="text-xs text-gray-400">Numéro</p>
-                                    <p className="text-white font-medium">{devis.numero_devis}</p>
+                                    <p className="text-xs text-muted-foreground">Numéro</p>
+                                    <p className="text-foreground font-medium">{devis.numero_devis}</p>
                                 </div>
                             </div>
                             <div className="flex items-center gap-3">
                                 <MapPin className="h-5 w-5 text-amber-500" />
                                 <div>
-                                    <p className="text-xs text-gray-400">Agence</p>
-                                    <p className="text-white font-medium">{devis.agence_nom || 'N/A'}</p>
+                                    <p className="text-xs text-muted-foreground">Agence</p>
+                                    <p className="text-foreground font-medium">{devis.agence_nom || 'N/A'}</p>
                                 </div>
                             </div>
                             <div className="flex items-center gap-3">
                                 <Calendar className="h-5 w-5 text-amber-500" />
                                 <div>
-                                    <p className="text-xs text-gray-400">Date</p>
-                                    <p className="text-white font-medium">{formatDateTime(devis.date_reception)}</p>
-                                    <p className="text-xs text-gray-500">Il y a {joursDepuisReception(devis.date_reception)} jours</p>
+                                    <p className="text-xs text-muted-foreground">Date</p>
+                                    <p className="text-foreground font-medium">{formatDateTime(devis.date_reception)}</p>
+                                    <p className="text-xs text-muted-foreground">Il y a {joursDepuisReception(devis.date_reception)} jours</p>
                                 </div>
                             </div>
                             {devis.montant && (
                                 <div className="flex items-center gap-3">
                                     <Euro className="h-5 w-5 text-amber-500" />
                                     <div>
-                                        <p className="text-xs text-gray-400">Montant</p>
-                                        <p className="text-white font-medium text-lg">{devis.montant.toLocaleString('fr-FR')} €</p>
+                                        <p className="text-xs text-muted-foreground">Montant</p>
+                                        <p className="text-foreground font-medium text-lg">{devis.montant.toLocaleString('fr-FR')} €</p>
                                     </div>
                                 </div>
                             )}
@@ -346,21 +347,21 @@ export default function DevisDetailPage() {
                     </CardContent>
                 </Card>
 
-                <Card className="bg-[#1a1f2e] border-gray-800">
+                <Card className="bg-card border-border">
                     <CardHeader>
-                        <CardTitle className="text-white">Contact</CardTitle>
+                        <CardTitle className="text-foreground">Contact</CardTitle>
                     </CardHeader>
                     <CardContent className="space-y-3">
                         <div className="flex items-center gap-3">
                             <Mail className="h-5 w-5 text-amber-500" />
-                            <a href={`mailto:${devis.email_client}`} className="text-white hover:text-amber-500">
+                            <a href={`mailto:${devis.email_client}`} className="text-foreground hover:text-amber-500">
                                 {devis.email_client}
                             </a>
                         </div>
                         {devis.telephone_client && (
                             <div className="flex items-center gap-3">
                                 <Phone className="h-5 w-5 text-amber-500" />
-                                <a href={`tel:${devis.telephone_client}`} className="text-white hover:text-amber-500">
+                                <a href={`tel:${devis.telephone_client}`} className="text-foreground hover:text-amber-500">
                                     {devis.telephone_client}
                                 </a>
                             </div>
@@ -389,46 +390,46 @@ export default function DevisDetailPage() {
                     </CardContent>
                 </Card>
 
-                <Card className="bg-[#1a1f2e] border-gray-800">
+                <Card className="bg-card border-border">
                     <CardHeader>
-                        <CardTitle className="text-white">Suivi</CardTitle>
+                        <CardTitle className="text-foreground">Suivi</CardTitle>
                     </CardHeader>
                     <CardContent>
                         <div className="flex items-center gap-4 flex-wrap">
                             <div className="flex items-center gap-2">
-                                <div className={`h-12 w-12 rounded-full flex items-center justify-center ${devis.appel_j0_effectue ? 'bg-blue-500/20 text-blue-500' : 'bg-gray-700 text-gray-500'}`}>
+                                <div className={`h-12 w-12 rounded-full flex items-center justify-center ${devis.appel_j0_effectue ? 'bg-blue-500/20 text-blue-500' : 'bg-muted text-muted-foreground'}`}>
                                     {devis.appel_j0_effectue ? <CheckCircle2 className="h-6 w-6" /> : <PhoneCall className="h-6 w-6" />}
                                 </div>
                                 <div>
-                                    <p className="text-xs text-gray-400">J+0</p>
-                                    <p className="text-white text-sm">{formatDateTime(devis.date_reception)}</p>
+                                    <p className="text-xs text-muted-foreground">J+0</p>
+                                    <p className="text-foreground text-sm">{formatDateTime(devis.date_reception)}</p>
                                 </div>
                             </div>
-                            <div className={`h-1 w-16 ${devis.appel_j2_effectue ? 'bg-orange-500' : 'bg-gray-700'}`} />
+                            <div className={`h-1 w-16 ${devis.appel_j2_effectue ? 'bg-orange-500' : 'bg-muted'}`} />
                             <div className="flex items-center gap-2">
-                                <div className={`h-12 w-12 rounded-full flex items-center justify-center ${devis.appel_j2_effectue ? 'bg-orange-500/20 text-orange-500' : 'bg-gray-700 text-gray-500'}`}>
+                                <div className={`h-12 w-12 rounded-full flex items-center justify-center ${devis.appel_j2_effectue ? 'bg-orange-500/20 text-orange-500' : 'bg-muted text-muted-foreground'}`}>
                                     {devis.appel_j2_effectue ? <CheckCircle2 className="h-6 w-6" /> : <Clock className="h-6 w-6" />}
                                 </div>
                                 <div>
-                                    <p className="text-xs text-gray-400">J+2</p>
+                                    <p className="text-xs text-muted-foreground">J+2</p>
                                     {devis.date_appel_j2 ? (
-                                        <p className="text-white text-sm">{formatDateTime(devis.date_appel_j2)}</p>
+                                        <p className="text-foreground text-sm">{formatDateTime(devis.date_appel_j2)}</p>
                                     ) : (
-                                        <p className="text-gray-500 text-sm">En attente</p>
+                                        <p className="text-muted-foreground text-sm">En attente</p>
                                     )}
                                 </div>
                             </div>
-                            <div className={`h-1 w-16 ${devis.email_j4_envoye ? 'bg-purple-500' : 'bg-gray-700'}`} />
+                            <div className={`h-1 w-16 ${devis.email_j4_envoye ? 'bg-purple-500' : 'bg-muted'}`} />
                             <div className="flex items-center gap-2">
-                                <div className={`h-12 w-12 rounded-full flex items-center justify-center ${devis.email_j4_envoye ? 'bg-purple-500/20 text-purple-500' : 'bg-gray-700 text-gray-500'}`}>
+                                <div className={`h-12 w-12 rounded-full flex items-center justify-center ${devis.email_j4_envoye ? 'bg-purple-500/20 text-purple-500' : 'bg-muted text-muted-foreground'}`}>
                                     {devis.email_j4_envoye ? <CheckCircle2 className="h-6 w-6" /> : <Clock className="h-6 w-6" />}
                                 </div>
                                 <div>
-                                    <p className="text-xs text-gray-400">J+4</p>
+                                    <p className="text-xs text-muted-foreground">J+4</p>
                                     {devis.date_email_j4 ? (
-                                        <p className="text-white text-sm">{formatDateTime(devis.date_email_j4)}</p>
+                                        <p className="text-foreground text-sm">{formatDateTime(devis.date_email_j4)}</p>
                                     ) : (
-                                        <p className="text-gray-500 text-sm">En attente</p>
+                                        <p className="text-muted-foreground text-sm">En attente</p>
                                     )}
                                 </div>
                             </div>
@@ -440,9 +441,9 @@ export default function DevisDetailPage() {
                                             <CheckCircle2 className="h-6 w-6" />
                                         </div>
                                         <div>
-                                            <p className="text-xs text-gray-400">Converti</p>
+                                            <p className="text-xs text-muted-foreground">Converti</p>
                                             {devis.date_conversion && (
-                                                <p className="text-white text-sm">{formatDateTime(devis.date_conversion)}</p>
+                                                <p className="text-foreground text-sm">{formatDateTime(devis.date_conversion)}</p>
                                             )}
                                         </div>
                                     </div>
@@ -456,7 +457,7 @@ export default function DevisDetailPage() {
                                             <XCircle className="h-6 w-6" />
                                         </div>
                                         <div>
-                                            <p className="text-xs text-gray-400">Perdu</p>
+                                            <p className="text-xs text-muted-foreground">Perdu</p>
                                         </div>
                                     </div>
                                 </>
@@ -466,9 +467,9 @@ export default function DevisDetailPage() {
                 </Card>
 
                 {!devis.converti && devis.statut !== 'perdu' && (
-                    <Card className="bg-[#1a1f2e] border-gray-800">
+                    <Card className="bg-card border-border">
                         <CardHeader>
-                            <CardTitle className="text-white">Actions</CardTitle>
+                            <CardTitle className="text-foreground">Actions</CardTitle>
                         </CardHeader>
                         <CardContent className="flex gap-3 flex-wrap">
                             {!devis.appel_j0_effectue && !devis.contact_etabli && (
@@ -520,12 +521,12 @@ export default function DevisDetailPage() {
                     </Card>
                 )}
 
-                <Card className="bg-[#1a1f2e] border-gray-800">
+                <Card className="bg-card border-border">
                     <CardHeader>
-                        <CardTitle className="text-white">Notes</CardTitle>
+                        <CardTitle className="text-foreground">Notes</CardTitle>
                     </CardHeader>
                     <CardContent className="space-y-3">
-                        <textarea value={notes} onChange={(e) => setNotes(e.target.value)} placeholder="Notes..." className="w-full min-h-[120px] rounded-lg bg-[#0a0e1a] border border-gray-700 p-3 text-white placeholder:text-gray-500 focus:border-amber-500 focus:outline-none resize-none" />
+                        <textarea value={notes} onChange={(e) => setNotes(e.target.value)} placeholder="Notes..." className="w-full min-h-[120px] rounded-lg bg-background border border-border p-3 text-foreground placeholder:text-muted-foreground focus:border-amber-500 focus:outline-none resize-none" />
                         <button onClick={handleSaveNotes} disabled={saving} className="flex items-center gap-2 px-4 py-2 rounded-lg bg-amber-600 text-white hover:bg-amber-700 disabled:opacity-50">
                             <Save className="h-4 w-4" />
                             Sauvegarder
@@ -535,19 +536,19 @@ export default function DevisDetailPage() {
 
                 {showConfirm === 'appel_j0' && (
                     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-                        <Card className="bg-[#1a1f2e] border-gray-800 w-full max-w-md">
+                        <Card className="bg-card border-border w-full max-w-md">
                             <CardHeader>
-                                <CardTitle className="text-white">Confirmer l'appel J+0</CardTitle>
+                                <CardTitle className="text-foreground">Confirmer l'appel J+0</CardTitle>
                             </CardHeader>
                             <CardContent className="space-y-4">
-                                <p className="text-gray-400">
+                                <p className="text-muted-foreground">
                                     Tu as effectué le premier appel téléphonique avec ce client ?
                                 </p>
                                 <div className="flex gap-3">
                                     <button onClick={handleAppelJ0} disabled={saving} className="flex-1 px-4 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-50">
                                         Oui, appel effectué
                                     </button>
-                                    <button onClick={() => setShowConfirm(null)} disabled={saving} className="flex-1 px-4 py-2 rounded-lg bg-gray-700 text-white hover:bg-gray-600 disabled:opacity-50">
+                                    <button onClick={() => setShowConfirm(null)} disabled={saving} className="flex-1 px-4 py-2 rounded-lg bg-muted text-foreground hover:bg-secondary disabled:opacity-50">
                                         Annuler
                                     </button>
                                 </div>
@@ -558,19 +559,19 @@ export default function DevisDetailPage() {
 
                 {showConfirm === 'appel_j2' && (
                     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-                        <Card className="bg-[#1a1f2e] border-gray-800 w-full max-w-md">
+                        <Card className="bg-card border-border w-full max-w-md">
                             <CardHeader>
-                                <CardTitle className="text-white">Confirmer l'appel J+2</CardTitle>
+                                <CardTitle className="text-foreground">Confirmer l'appel J+2</CardTitle>
                             </CardHeader>
                             <CardContent className="space-y-4">
-                                <p className="text-gray-400">
+                                <p className="text-muted-foreground">
                                     Tu as effectué le deuxième appel téléphonique (J+2) avec ce client ?
                                 </p>
                                 <div className="flex gap-3">
                                     <button onClick={handleAppelJ2} disabled={saving} className="flex-1 px-4 py-2 rounded-lg bg-orange-600 text-white hover:bg-orange-700 disabled:opacity-50">
                                         Oui, appel effectué
                                     </button>
-                                    <button onClick={() => setShowConfirm(null)} disabled={saving} className="flex-1 px-4 py-2 rounded-lg bg-gray-700 text-white hover:bg-gray-600 disabled:opacity-50">
+                                    <button onClick={() => setShowConfirm(null)} disabled={saving} className="flex-1 px-4 py-2 rounded-lg bg-muted text-foreground hover:bg-secondary disabled:opacity-50">
                                         Annuler
                                     </button>
                                 </div>
@@ -581,12 +582,12 @@ export default function DevisDetailPage() {
 
                 {showConfirm === 'contact' && (
                     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-                        <Card className="bg-[#1a1f2e] border-gray-800 w-full max-w-md">
+                        <Card className="bg-card border-border w-full max-w-md">
                             <CardHeader>
-                                <CardTitle className="text-white">Confirmer le contact</CardTitle>
+                                <CardTitle className="text-foreground">Confirmer le contact</CardTitle>
                             </CardHeader>
                             <CardContent className="space-y-4">
-                                <p className="text-gray-400">
+                                <p className="text-muted-foreground">
                                     Marquer ce client comme contacté ?
                                     <br />
                                     <span className="text-amber-500 text-sm">
@@ -597,7 +598,7 @@ export default function DevisDetailPage() {
                                     <button onClick={handleContactEtabli} disabled={saving} className="flex-1 px-4 py-2 rounded-lg bg-green-600 text-white hover:bg-green-700 disabled:opacity-50">
                                         Oui, contact établi
                                     </button>
-                                    <button onClick={() => setShowConfirm(null)} disabled={saving} className="flex-1 px-4 py-2 rounded-lg bg-gray-700 text-white hover:bg-gray-600 disabled:opacity-50">
+                                    <button onClick={() => setShowConfirm(null)} disabled={saving} className="flex-1 px-4 py-2 rounded-lg bg-muted text-foreground hover:bg-secondary disabled:opacity-50">
                                         Annuler
                                     </button>
                                 </div>
@@ -608,17 +609,17 @@ export default function DevisDetailPage() {
 
                 {showConfirm === 'convertir' && (
                     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-                        <Card className="bg-[#1a1f2e] border-gray-800 w-full max-w-md">
+                        <Card className="bg-card border-border w-full max-w-md">
                             <CardHeader>
-                                <CardTitle className="text-white">Confirmer</CardTitle>
+                                <CardTitle className="text-foreground">Confirmer</CardTitle>
                             </CardHeader>
                             <CardContent className="space-y-4">
-                                <p className="text-gray-400">Convertir ce devis en contrat ?</p>
+                                <p className="text-muted-foreground">Convertir ce devis en contrat ?</p>
                                 <div className="flex gap-3">
                                     <button onClick={handleConvertir} disabled={saving} className="flex-1 px-4 py-2 rounded-lg bg-green-600 text-white hover:bg-green-700 disabled:opacity-50">
                                         Oui
                                     </button>
-                                    <button onClick={() => setShowConfirm(null)} disabled={saving} className="flex-1 px-4 py-2 rounded-lg bg-gray-700 text-white hover:bg-gray-600 disabled:opacity-50">
+                                    <button onClick={() => setShowConfirm(null)} disabled={saving} className="flex-1 px-4 py-2 rounded-lg bg-muted text-foreground hover:bg-secondary disabled:opacity-50">
                                         Annuler
                                     </button>
                                 </div>
@@ -629,17 +630,17 @@ export default function DevisDetailPage() {
 
                 {showConfirm === 'perdu' && (
                     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-                        <Card className="bg-[#1a1f2e] border-gray-800 w-full max-w-md">
+                        <Card className="bg-card border-border w-full max-w-md">
                             <CardHeader>
-                                <CardTitle className="text-white">Confirmer</CardTitle>
+                                <CardTitle className="text-foreground">Confirmer</CardTitle>
                             </CardHeader>
                             <CardContent className="space-y-4">
-                                <p className="text-gray-400">Marquer ce devis comme perdu ?</p>
+                                <p className="text-muted-foreground">Marquer ce devis comme perdu ?</p>
                                 <div className="flex gap-3">
                                     <button onClick={handleMarquerPerdu} disabled={saving} className="flex-1 px-4 py-2 rounded-lg bg-red-600 text-white hover:bg-red-700 disabled:opacity-50">
                                         Oui
                                     </button>
-                                    <button onClick={() => setShowConfirm(null)} disabled={saving} className="flex-1 px-4 py-2 rounded-lg bg-gray-700 text-white hover:bg-gray-600 disabled:opacity-50">
+                                    <button onClick={() => setShowConfirm(null)} disabled={saving} className="flex-1 px-4 py-2 rounded-lg bg-muted text-foreground hover:bg-secondary disabled:opacity-50">
                                         Annuler
                                     </button>
                                 </div>

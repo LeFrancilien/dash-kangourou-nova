@@ -2,13 +2,13 @@
 
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
-import { getDevis } from '@/lib/supabase'
+import { getDevis, Agence, Devis } from '@/lib/supabase'
 import { supabase } from '@/lib/supabase'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Card, CardContent } from '@/components/ui/card'
+import { NouveauDevisDialog } from '@/components/nouveau-devis-dialog'
+import { ExportButton } from '@/components/export-button'
 import {
     FileText,
-    Filter,
-    Download,
     Search,
     Calendar,
     MapPin,
@@ -16,38 +16,11 @@ import {
     Clock,
     CheckCircle2,
     XCircle,
-    AlertCircle
+    Plus
 } from 'lucide-react'
 
-interface Devis {
-    id: number
-    numero_devis: string
-    nom_client: string
-    email_client: string
-    telephone_client?: string
-    montant?: number
-    agence_id: number
-    agence_nom?: string
-    date_reception: string
-    statut: string
-    relance_j2_envoyee: boolean
-    date_relance_j2?: string
-    email_j4_envoye: boolean
-    date_email_j4?: string
-    converti: boolean
-    date_conversion?: string
-    notes?: string
-    created_at: string
-    updated_at: string
-}
-
-interface Agence {
-    id: number
-    nom: string
-}
-
 export default function DevisPage() {
-    const [devis, setDevis] = useState<Devis[]>([])
+    const [devis, setDevis] = useState<Awaited<ReturnType<typeof getDevis>>>([])
     const [agences, setAgences] = useState<Agence[]>([])
     const [loading, setLoading] = useState(true)
     const [filtreStatut, setFiltreStatut] = useState<string>('tous')
@@ -55,28 +28,28 @@ export default function DevisPage() {
     const [recherche, setRecherche] = useState('')
 
     // Charger les devis et les agences au montage
-    useEffect(() => {
-        async function loadData() {
-            try {
-                // Charger les devis
-                const dataDevis = await getDevis()
-                setDevis(dataDevis)
+    async function loadData() {
+        try {
+            // Charger les devis
+            const dataDevis = await getDevis()
+            setDevis(dataDevis)
 
-                // Charger les agences
-                const { data: dataAgences, error } = await supabase
-                    .from('agences')
-                    .select('id, nom')
-                    .order('nom', { ascending: true })
+            // Charger les agences
+            const { data: dataAgences, error } = await supabase
+                .from('agences')
+                .select('*')
+                .order('nom', { ascending: true })
 
-                if (error) throw error
-                setAgences(dataAgences || [])
-            } catch (error) {
-                console.error('Erreur chargement données:', error)
-            } finally {
-                setLoading(false)
-            }
+            if (error) throw error
+            setAgences(dataAgences || [])
+        } catch (error) {
+            console.error('Erreur chargement données:', error)
+        } finally {
+            setLoading(false)
         }
+    }
 
+    useEffect(() => {
         loadData()
     }, [])
 
@@ -139,42 +112,44 @@ export default function DevisPage() {
 
     if (loading) {
         return (
-            <div className="flex h-screen items-center justify-center bg-[#0a0e1a]">
-                <div className="text-gray-400">Chargement des devis...</div>
+            <div className="flex h-screen items-center justify-center">
+                <div className="text-muted-foreground">Chargement des devis...</div>
             </div>
         )
     }
 
     return (
-        <div className="flex-1 overflow-y-auto bg-[#0a0e1a] p-6">
+        <div className="flex-1 overflow-y-auto p-6">
             <div className="mx-auto max-w-7xl space-y-6">
-                {/* En-tête */}
+                {/* En-tête avec Nouveau Devis */}
                 <div className="flex items-center justify-between">
                     <div>
-                        <h1 className="text-3xl font-bold text-white">Gestion des Devis</h1>
-                        <p className="text-gray-400 mt-2">
+                        <h1 className="text-3xl font-bold text-foreground">Gestion des Devis</h1>
+                        <p className="text-muted-foreground mt-2">
                             {devisFiltres.length} devis {devisFiltres.length !== devis.length && `sur ${devis.length}`}
                         </p>
                     </div>
-                    <button className="flex items-center gap-2 rounded-lg bg-amber-600 px-4 py-2 text-white hover:bg-amber-700 transition-colors">
-                        <FileText className="h-4 w-4" />
-                        Nouveau devis
-                    </button>
+                    <NouveauDevisDialog agences={agences} onSuccess={loadData}>
+                        <button className="flex items-center gap-2 rounded-lg bg-amber-600 px-4 py-2 text-white hover:bg-amber-700 transition-colors">
+                            <Plus className="h-4 w-4" />
+                            Nouveau devis
+                        </button>
+                    </NouveauDevisDialog>
                 </div>
 
-                {/* Filtres */}
+                {/* Filtres et Export */}
                 <Card className="bg-[#1a1f2e] border-gray-800">
                     <CardContent className="p-6">
                         <div className="grid gap-4 md:grid-cols-4">
                             {/* Recherche */}
-                            <div className="relative">
-                                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+                            <div className="relative flex-1">
+                                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                                 <input
                                     type="text"
-                                    placeholder="Rechercher..."
+                                    placeholder="Rechercher un client, un devis..."
                                     value={recherche}
                                     onChange={(e) => setRecherche(e.target.value)}
-                                    className="w-full rounded-lg bg-[#0a0e1a] border border-gray-700 pl-10 pr-4 py-2 text-white placeholder:text-gray-500 focus:border-amber-500 focus:outline-none"
+                                    className="w-full pl-9 pr-4 py-2 rounded-lg bg-background border border-border text-foreground placeholder:text-muted-foreground focus:border-amber-500 focus:outline-none"
                                 />
                             </div>
 
@@ -182,7 +157,7 @@ export default function DevisPage() {
                             <select
                                 value={filtreStatut}
                                 onChange={(e) => setFiltreStatut(e.target.value)}
-                                className="rounded-lg bg-[#0a0e1a] border border-gray-700 px-4 py-2 text-white focus:border-amber-500 focus:outline-none"
+                                className="bg-background border border-border text-foreground text-sm rounded-lg focus:ring-amber-500 focus:border-amber-500 block p-2.5"
                             >
                                 <option value="tous">Tous les statuts</option>
                                 <option value="recu">Reçu</option>
@@ -196,7 +171,7 @@ export default function DevisPage() {
                             <select
                                 value={filtreAgence}
                                 onChange={(e) => setFiltreAgence(e.target.value)}
-                                className="rounded-lg bg-[#0a0e1a] border border-gray-700 px-4 py-2 text-white focus:border-amber-500 focus:outline-none"
+                                className="bg-background border border-border text-foreground text-sm rounded-lg focus:ring-amber-500 focus:border-amber-500 block p-2.5"
                             >
                                 <option value="toutes">Toutes les agences</option>
                                 {agences.map((agence) => (
@@ -206,11 +181,8 @@ export default function DevisPage() {
                                 ))}
                             </select>
 
-                            {/* Export */}
-                            <button className="flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-4 py-2 text-gray-300 hover:bg-[#0a0e1a] transition-colors">
-                                <Download className="h-4 w-4" />
-                                Exporter
-                            </button>
+                            {/* Export Button */}
+                            <ExportButton data={devisFiltres} />
                         </div>
                     </CardContent>
                 </Card>
@@ -235,8 +207,8 @@ export default function DevisPage() {
                                         {/* Infos principales */}
                                         <div className="flex-1">
                                             <div className="flex items-center gap-3 mb-3">
-                                                <h3 className="text-lg font-semibold text-white">
-                                                    {d.nom_client}
+                                                <h3 className="text-lg font-semibold text-foreground">
+                                                    {d.prenom_client} {d.nom_client.toUpperCase()}
                                                 </h3>
                                                 <span className={`px-3 py-1 rounded-full text-xs font-medium border ${getStatutColor(d.statut)}`}>
                                                     {getStatutLabel(d.statut)}
@@ -258,9 +230,9 @@ export default function DevisPage() {
                                                 </div>
                                                 {d.montant && (
                                                     <div className="flex items-center gap-2 text-gray-400">
-                                                        <Euro className="h-4 w-4" />
-                                                        <span>{d.montant.toLocaleString('fr-FR')} €</span>
-                                                    </div>
+                                                        <div className="text-right">
+                                                            <p className="text-xl font-bold text-foreground mb-1">{d.montant.toLocaleString('fr-FR')} €</p>
+                                                        </div>                    </div>
                                                 )}
                                             </div>
 

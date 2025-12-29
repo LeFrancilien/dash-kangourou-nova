@@ -29,6 +29,7 @@ export interface Devis {
   id: number
   numero_devis: string
   nom_client: string
+  prenom_client: string
   email_client: string
   telephone_client?: string | null
   montant?: number | null

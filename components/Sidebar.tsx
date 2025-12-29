@@ -1,374 +1,146 @@
-"use client"
+'use client'
 
-import * as React from "react"
-import Image from "next/image"
+import Link from 'next/link'
+import { usePathname } from 'next/navigation'
+import Image from 'next/image'
+import { useEffect, useState } from 'react'
+import { Home, FileText, Users, KanbanSquare, Calendar, LogOut } from 'lucide-react'
+import { supabase } from '@/lib/supabase'
 import {
-    Sidebar,
-    SidebarContent,
-    SidebarFooter,
-    SidebarGroup,
-    SidebarGroupContent,
-    SidebarGroupLabel,
-    SidebarHeader,
-    SidebarMenu,
-    SidebarMenuAction,
-    SidebarMenuButton,
-    SidebarMenuItem,
-} from "@/components/ui/sidebar"
-import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuGroup,
-    DropdownMenuItem,
-    DropdownMenuLabel,
-    DropdownMenuSeparator,
-    DropdownMenuTrigger,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Button } from "@/components/ui/button"
-import {
-    BellIcon,
-    CreditCardIcon,
-    DatabaseIcon,
-    FolderIcon,
-    LogOutIcon,
-    MailIcon,
-    MoreHorizontalIcon,
-    MoreVerticalIcon,
-    PanelLeftIcon,
-    PlusCircleIcon,
-    SettingsIcon,
-    ShareIcon,
-    TrashIcon,
-    UserCircleIcon,
-} from "lucide-react"
 
-interface AppSidebarProps extends React.ComponentProps<typeof Sidebar> {
-    activeItem: string
-    setActiveItem: (item: string) => void
-}
 
-export function AppSidebar({ activeItem, setActiveItem, ...props }: AppSidebarProps) {
-    const navMain = [
-        {
-            title: "Tableau de bord",
-            url: "#",
-        },
-        {
-            title: "Cycle de vie",
-            url: "#",
-        },
-        {
-            title: "Analystiques",
-            url: "#",
-        },
-        {
-            title: "Projets",
-            url: "#",
-        },
-        {
-            title: "Équipe",
-            url: "#",
-        },
-    ]
+const navigation = [
+  { name: 'Tableau de bord', href: '/dashboard', icon: Home },
+  { name: 'Devis', href: '/devis', icon: FileText },
+  { name: 'Clients', href: '/clients', icon: Users },
+  { name: 'Vue Kanban', href: '/kanban', icon: KanbanSquare },
+  { name: 'Calendrier', href: '/calendrier', icon: Calendar },
+]
 
-    const navSecondary = [
-        {
-            title: "Paramètres",
-            url: "#",
-        },
-        {
-            title: "Aide",
-            url: "#",
-        },
-        {
-            title: "Recherche",
-            url: "#",
-        },
-    ]
+export function Sidebar() {
+  const pathname = usePathname()
+  const [user, setUser] = useState<{ email?: string, name?: string } | null>(null)
 
-    const documents = [
-        {
-            name: "Bibliothèque de données",
-            url: "#",
-        },
-        {
-            name: "Rapports",
-            url: "#",
-        },
-        {
-            name: "Assistant Word",
-            url: "#",
-        },
-    ]
-
-    const user = {
-        name: "shadcn",
-        email: "m@example.com",
-        avatar: "/avatars/shadcn.svg",
+  useEffect(() => {
+    async function getUser() {
+      const { data: { user } } = await supabase.auth.getUser()
+      if (user) {
+        setUser({
+          email: user.email,
+          name: user.user_metadata?.full_name || user.email?.split('@')[0]
+        })
+      }
     }
+    getUser()
 
-    return (
-        <Sidebar collapsible="icon" {...props}>
-            <SidebarHeader>
-                <SidebarMenu>
-                    <SidebarMenuItem>
-                        <SidebarMenuButton
-                            asChild
-                            className="data-[slot=sidebar-menu-button]:!p-1.5"
-                        >
-                            <a href="#">
-                                <Image
-                                    src="/kangourou-kids-logo.png"
-                                    alt="Kangourou Kids"
-                                    width={120}
-                                    height={32}
-                                    className="h-8 w-auto object-contain"
-                                />
-                            </a>
-                        </SidebarMenuButton>
-                    </SidebarMenuItem>
-                </SidebarMenu>
-            </SidebarHeader>
-            <SidebarContent>
-                <NavMain items={navMain} activeItem={activeItem} setActiveItem={setActiveItem} />
-                <NavDocuments items={documents} />
-                <NavSecondary items={navSecondary} className="mt-auto" />
-            </SidebarContent>
-            <SidebarFooter>
-                <NavUser user={user} />
-            </SidebarFooter>
-        </Sidebar>
-    )
-}
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      if (session?.user) {
+        setUser({
+          email: session.user.email,
+          name: session.user.user_metadata?.full_name || session.user.email?.split('@')[0]
+        })
+      } else {
+        setUser(null)
+      }
+    })
 
-function NavMain({
-    items,
-    activeItem,
-    setActiveItem,
-}: {
-    items: {
-        title: string
-        url: string
-    }[]
-    activeItem: string
-    setActiveItem: (item: string) => void
-}) {
-    return (
-        <SidebarGroup>
-            <SidebarGroupContent className="flex flex-col gap-2">
-                <SidebarMenu>
-                    <SidebarMenuItem className="flex items-center gap-2">
-                        <SidebarMenuButton
-                            tooltip="Quick Create"
-                            className="bg-primary text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground active:bg-primary/90 active:text-primary-foreground min-w-8 duration-200 ease-linear"
-                        >
-                            <PlusCircleIcon
-                            />
-                            <span>Création rapide</span>
-                        </SidebarMenuButton>
-                        <Button
-                            size="icon"
-                            className="size-8 group-data-[collapsible=icon]:opacity-0"
-                            variant="outline"
-                        >
-                            <MailIcon
-                            />
-                            <span className="sr-only">Boîte de réception</span>
-                        </Button>
-                    </SidebarMenuItem>
-                </SidebarMenu>
-                <SidebarMenu>
-                    {items.map((item) => (
-                        <SidebarMenuItem key={item.title}>
-                            <SidebarMenuButton
-                                asChild
-                                tooltip={item.title}
-                                isActive={activeItem === item.title}
-                                onClick={() => setActiveItem(item.title)}
-                            >
-                                <a href={item.url}>
-                                    <PanelLeftIcon />
-                                    <span>{item.title}</span>
-                                </a>
-                            </SidebarMenuButton>
-                        </SidebarMenuItem>
-                    ))}
-                </SidebarMenu>
-            </SidebarGroupContent>
-        </SidebarGroup>
-    )
-}
-
-function NavDocuments({
-    items,
-}: {
-    items: {
-        name: string
-        url: string
-    }[]
-}) {
-    return (
-        <SidebarGroup className="group-data-[collapsible=icon]:hidden">
-            <SidebarGroupLabel>Documents</SidebarGroupLabel>
-            <SidebarMenu>
-                {items.map((item) => (
-                    <SidebarMenuItem key={item.name}>
-                        <SidebarMenuButton asChild>
-                            <a href={item.url}>
-                                <DatabaseIcon />
-                                <span>{item.name}</span>
-                            </a>
-                        </SidebarMenuButton>
-                        <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                                <SidebarMenuAction
-                                    showOnHover
-                                    className="data-[state=open]:bg-accent rounded-sm"
-                                >
-                                    <MoreHorizontalIcon />
-                                    <span className="sr-only">More</span>
-                                </SidebarMenuAction>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent className="w-24 rounded-lg" align="end">
-                                <DropdownMenuItem>
-                                    <FolderIcon
-                                    />
-                                    <span>Ouvrir</span>
-                                </DropdownMenuItem>
-                                <DropdownMenuItem>
-                                    <ShareIcon
-                                    />
-                                    <span>Partager</span>
-                                </DropdownMenuItem>
-                                <DropdownMenuSeparator />
-                                <DropdownMenuItem variant="destructive">
-                                    <TrashIcon
-                                    />
-                                    <span>Delete</span>
-                                </DropdownMenuItem>
-                            </DropdownMenuContent>
-                        </DropdownMenu>
-                    </SidebarMenuItem>
-                ))}
-                <SidebarMenuItem>
-                    <SidebarMenuButton className="text-sidebar-foreground/70">
-                        <MoreHorizontalIcon className="text-sidebar-foreground/70" />
-                        <span>More</span>
-                    </SidebarMenuButton>
-                </SidebarMenuItem>
-            </SidebarMenu>
-        </SidebarGroup>
-    )
-}
-
-function NavSecondary({
-    items,
-    ...props
-}: {
-    items: {
-        title: string
-        url: string
-    }[]
-} & React.ComponentPropsWithoutRef<typeof SidebarGroup>) {
-    return (
-        <SidebarGroup {...props}>
-            <SidebarGroupContent>
-                <SidebarMenu>
-                    {items.map((item) => (
-                        <SidebarMenuItem key={item.title}>
-                            <SidebarMenuButton asChild>
-                                <a href={item.url}>
-                                    <SettingsIcon />
-                                    <span>{item.title}</span>
-                                </a>
-                            </SidebarMenuButton>
-                        </SidebarMenuItem>
-                    ))}
-                </SidebarMenu>
-            </SidebarGroupContent>
-        </SidebarGroup>
-    )
-}
-
-function NavUser({
-    user,
-}: {
-    user: {
-        name: string
-        email: string
-        avatar: string
+    return () => {
+      subscription.unsubscribe()
     }
-}) {
-    return (
-        <SidebarMenu>
-            <SidebarMenuItem>
-                <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                        <SidebarMenuButton
-                            size="lg"
-                            className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
-                        >
-                            <Avatar className="h-8 w-8 rounded-lg grayscale">
-                                <AvatarImage src={user.avatar} alt={user.name} />
-                                <AvatarFallback className="rounded-lg">CN</AvatarFallback>
-                            </Avatar>
-                            <div className="grid flex-1 text-left text-sm leading-tight">
-                                <span className="truncate font-medium">{user.name}</span>
-                                <span className="text-muted-foreground truncate text-xs">
-                                    {user.email}
-                                </span>
-                            </div>
-                            <MoreVerticalIcon className="ml-auto size-4" />
-                        </SidebarMenuButton>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent
-                        className="w-(--radix-dropdown-menu-trigger-width) min-w-56 rounded-lg"
-                        side="right"
-                        align="end"
-                        sideOffset={4}
-                    >
-                        <DropdownMenuLabel className="p-0 font-normal">
-                            <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
-                                <Avatar className="h-8 w-8 rounded-lg">
-                                    <AvatarImage src={user.avatar} alt={user.name} />
-                                    <AvatarFallback className="rounded-lg">CN</AvatarFallback>
-                                </Avatar>
-                                <div className="grid flex-1 text-left text-sm leading-tight">
-                                    <span className="truncate font-medium">{user.name}</span>
-                                    <span className="text-muted-foreground truncate text-xs">
-                                        {user.email}
-                                    </span>
-                                </div>
-                            </div>
-                        </DropdownMenuLabel>
-                        <DropdownMenuSeparator />
-                        <DropdownMenuGroup>
-                            <DropdownMenuItem>
-                                <UserCircleIcon
-                                />
-                                Account
-                            </DropdownMenuItem>
-                            <DropdownMenuItem>
-                                <CreditCardIcon
-                                />
-                                Billing
-                            </DropdownMenuItem>
-                            <DropdownMenuItem>
-                                <BellIcon
-                                />
-                                Notifications
-                            </DropdownMenuItem>
-                        </DropdownMenuGroup>
-                        <DropdownMenuSeparator />
-                        <DropdownMenuItem>
-                            <LogOutIcon
-                            />
-                            Log out
-                        </DropdownMenuItem>
-                    </DropdownMenuContent>
-                </DropdownMenu>
-            </SidebarMenuItem>
-        </SidebarMenu>
-    )
+  }, [])
+
+  return (
+    <div className="flex h-screen w-64 flex-col bg-slate-900">
+      {/* Logo */}
+      <div className="flex h-20 items-center px-6">
+        <div className="flex items-center gap-3">
+          <div className="relative h-12 w-12 overflow-hidden rounded bg-white">
+            <Image
+              src="/kangourou-kids-logo.png"
+              alt="Kangourou Kids"
+              fill
+              className="object-contain"
+            />
+          </div>
+          <span className="text-xl font-semibold text-white">K-Flow</span>
+        </div>
+      </div>
+
+      {/* Navigation */}
+      <nav className="flex-1 space-y-1 px-3 py-4">
+        {navigation.map((item) => {
+          const isActive = pathname === item.href
+          const Icon = item.icon
+
+          return (
+            <Link
+              key={item.name}
+              href={item.href}
+              className={`
+                flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors
+                ${isActive
+                  ? 'bg-orange-500 text-white'
+                  : 'text-slate-300 hover:bg-slate-800 hover:text-white'
+                }
+              `}
+            >
+              <Icon className="h-5 w-5" />
+              {item.name}
+            </Link>
+          )
+        })}
+      </nav>
+
+      {/* User section */}
+      <div className="border-t border-slate-800 p-4">
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <button className="flex w-full items-center justify-between gap-3 outline-none hover:opacity-80 transition-opacity">
+              <div className="flex items-center gap-3 overflow-hidden">
+                <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-orange-500 text-sm font-medium text-white">
+                  {user?.name?.[0]?.toUpperCase() || 'U'}
+                </div>
+                <div className="flex-1 overflow-hidden text-left">
+                  <p className="truncate text-sm font-medium text-white">{user?.name || 'Utilisateur'}</p>
+                  <p className="truncate text-xs text-slate-400">{user?.email || 'Non connecté'}</p>
+                </div>
+              </div>
+              <LogOut className="h-4 w-4 text-slate-500" />
+            </button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end" className="w-56 bg-slate-900 border-slate-800 text-white">
+            <DropdownMenuLabel>Mon Compte</DropdownMenuLabel>
+            <DropdownMenuSeparator className="bg-slate-800" />
+            {user ? (
+              <DropdownMenuItem
+                className="cursor-pointer focus:bg-slate-800 focus:text-white"
+                onClick={async () => {
+                  await supabase.auth.signOut()
+                  setUser(null)
+                  window.location.reload()
+                }}
+              >
+                <LogOut className="mr-2 h-4 w-4" />
+                <span>Se déconnecter</span>
+              </DropdownMenuItem>
+            ) : (
+              <DropdownMenuItem asChild className="cursor-pointer focus:bg-slate-800 focus:text-white">
+                <Link href="/login">
+                  <LogOut className="mr-2 h-4 w-4 rotate-180" />
+                  <span>Se connecter</span>
+                </Link>
+              </DropdownMenuItem>
+            )}
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </div>
+    </div>
+  )
 }
