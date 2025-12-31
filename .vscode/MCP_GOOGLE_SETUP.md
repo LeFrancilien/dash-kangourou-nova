@@ -81,10 +81,25 @@ Une fois configuré, vous pouvez utiliser Claude Code pour :
 - [Documentation Google Workspace MCP](https://github.com/taylorwilsdon/google_workspace_mcp)
 - [Site officiel](https://workspacemcp.com)
 
+## Utilisation avec Google Antigravity
+
+Si vous utilisez ce projet dans **Google Antigravity IDE** :
+
+1. **Authentification requise** : Configurez votre clé API Claude
+   - Voir le guide détaillé : `.vscode/ANTIGRAVITY_CLAUDE_SETUP.md`
+   - Commande rapide : `/login` dans le terminal Antigravity
+
+2. **Configuration MCP** : Le fichier `.vscode/mcp.json` est compatible avec Antigravity
+   - Les serveurs MCP se chargeront automatiquement
+   - Vérifiez le panneau MCP pour voir l'état de connexion
+
+3. **Modèles supportés** : Antigravity supporte Claude Sonnet 4.5 et Opus 4.5
+
 ## Dépannage
 
 Si vous rencontrez des problèmes :
 1. Vérifiez que Python 3.10+ est installé : `python3 --version`
 2. Vérifiez que uvx est installé : `uvx --version`
-3. Redémarrez Claude Code
-4. Consultez les logs du serveur MCP dans les paramètres de Claude Code
+3. Redémarrez Claude Code / Antigravity
+4. Consultez les logs du serveur MCP dans les paramètres
+5. **Antigravity uniquement** : Si erreur "Invalid API key", exécutez `/login`
