@@ -149,6 +149,20 @@ Ajoutez à `.gitignore` :
 **/secrets/
 ```
 
+## 🔗 Serveurs MCP configurés
+
+Ce projet est configuré avec plusieurs serveurs MCP :
+
+1. **Google Workspace** - Gmail, Drive, Calendar, Tasks
+   - Guide : `.vscode/MCP_GOOGLE_SETUP.md`
+
+2. **GitHub** - Repositories, Issues, Pull Requests
+   - Guide : `.vscode/GITHUB_MCP_SETUP.md`
+   - ⚠️ Nécessite un GitHub Personal Access Token
+
+3. **Shadcn** - Composants UI
+   - Déjà configuré
+
 ## 📚 Ressources
 
 - [Documentation Antigravity](https://antigravity.google/)
