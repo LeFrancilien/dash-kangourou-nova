@@ -6,6 +6,14 @@
         "shadcn@latest",
         "mcp"
       ]
+    },
+    "google-workspace": {
+      "command": "uvx",
+      "args": [
+        "workspace-mcp",
+        "--tool-tier",
+        "core"
+      ]
     }
   }
 }
