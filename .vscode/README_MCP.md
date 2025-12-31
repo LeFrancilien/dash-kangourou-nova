@@ -74,9 +74,14 @@ Configuration du serveur MCP GitHub (sans Docker).
 
 #### 2️⃣ Configurer GitHub Token
 ```bash
-# Créer le token sur https://github.com/settings/tokens
-# Puis définir la variable d'environnement
+# Option A : Utiliser le fichier .env.local (Recommandé)
+# Le token est déjà dans .env.local, il suffit de charger le fichier
+source load-env.sh
+
+# Option B : Variable d'environnement manuelle
 export GITHUB_TOKEN="votre_token_ici"
+
+# ⚠️ IMPORTANT : Lisez .vscode/SECURITE_TOKEN.md pour la sécurité !
 ```
 
 #### 3️⃣ Redémarrer Antigravity
@@ -136,19 +141,24 @@ Une fois configuré, vous pouvez demander à Claude :
 
 **⚠️ IMPORTANT** : Ne commitez jamais vos tokens ou clés API !
 
-Le fichier `.gitignore` doit contenir :
+### 🚨 Lisez le guide de sécurité complet
+👉 **[.vscode/SECURITE_TOKEN.md](.vscode/SECURITE_TOKEN.md)** 👈
+
+Le fichier `.gitignore` contient déjà :
 ```
-.env
-.env.local
-**/.claude.json
-**/secrets/
+.env*          # ✅ Tous les fichiers .env sont ignorés
 ```
 
+### ✅ Fichiers sécurisés
+- `.env.local` - Contient votre GITHUB_TOKEN (ignoré par Git)
+- `load-env.sh` - Script pour charger les variables d'environnement
+
 ### Bonnes pratiques
-1. Utilisez des variables d'environnement
+1. Utilisez `.env.local` pour stocker les tokens
 2. Tokens avec durée limitée (90 jours)
 3. Permissions minimales nécessaires
 4. Rotation régulière des tokens
+5. **Révoquez immédiatement** tout token exposé
 
 ## 📊 Architecture
 
