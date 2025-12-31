@@ -4,9 +4,13 @@
 
 if [ -f .env.local ]; then
     echo "🔑 Chargement des variables d'environnement depuis .env.local..."
-    export $(cat .env.local | grep -v '^#' | grep -v '^$' | xargs)
+    set -a
+    source .env.local
+    set +a
     echo "✅ Variables chargées :"
-    echo "   - GITHUB_TOKEN: ${GITHUB_TOKEN:0:20}..."
+    if [ ! -z "$GITHUB_TOKEN" ]; then
+        echo "   - GITHUB_TOKEN: ${GITHUB_TOKEN:0:20}..."
+    fi
     echo ""
     echo "💡 Pour vérifier : echo \$GITHUB_TOKEN"
 else
