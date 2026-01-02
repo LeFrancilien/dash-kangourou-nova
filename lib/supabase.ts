@@ -98,14 +98,14 @@ export interface ContratFantome {
   etape4_date_fin_contrat: string | null
 
   // Documents
-  documents: any
-  preuves: any
+  documents: Record<string, unknown> | null
+  preuves: Record<string, unknown> | null
 
   // Metadata
   created_at: string
   updated_at: string
   cloture_date: string | null
-  excel_raw: any
+  excel_raw: Record<string, unknown> | null
 }
 
 export interface Alerte {
@@ -163,6 +163,7 @@ export async function getDevis(filters?: {
   }
 
   // Ajouter le nom d'agence dans chaque devis
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   return (data || []).map((d: any) => ({
     ...d,
     agence_nom: d.agence?.nom || 'N/A'

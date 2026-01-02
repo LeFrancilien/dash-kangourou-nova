@@ -14,6 +14,17 @@ interface Client {
   devisAcceptes: number
 }
 
+// Interface locale pour le typage
+interface DevisRow {
+  email_client: string
+  nom_client: string
+  prenom_client: string
+  telephone_client: string | null
+  ville: string | null
+  client_commune: string | null
+  statut: string
+}
+
 export default function ClientsPage() {
   const [clients, setClients] = useState<Client[]>([])
   const [filteredClients, setFilteredClients] = useState<Client[]>([])
@@ -49,7 +60,7 @@ export default function ClientsPage() {
         // Grouper par email client
         const clientsMap = new Map<string, Client>()
 
-        devis.forEach((d: any) => {
+        devis.forEach((d: DevisRow) => {
           // Utiliser email_client comme identifiant unique
           if (!d.email_client) return
 

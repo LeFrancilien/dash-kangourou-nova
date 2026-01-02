@@ -13,12 +13,10 @@ import {
     MapPin,
     PenTool,
     CheckCircle2,
-    XCircle,
     User,
     Euro,
     FileText,
-    Clock,
-    AlertCircle
+    Clock
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -27,7 +25,6 @@ import { fr } from 'date-fns/locale'
 import { toast } from 'sonner'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog'
 import { Label } from '@/components/ui/label'
-import { Switch } from '@/components/ui/switch'
 
 // Type definitions (copied from original file)
 interface Devis {
@@ -98,7 +95,7 @@ function DevisDetailsContent() {
         if (!devis) return
 
         try {
-            const updates: any = {
+            const updates: Partial<Devis> = {
                 statut: newStatus,
                 notes: notes,
                 updated_at: new Date().toISOString()

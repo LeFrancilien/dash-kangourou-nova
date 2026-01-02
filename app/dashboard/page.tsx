@@ -23,9 +23,50 @@ interface Stats {
   tauxConversion: number
 }
 
+interface DashboardDevis {
+  statut: string
+  email_client: string
+  date_reception: string
+  agence_id: number
+}
+
 interface ChartData {
   name: string
   [key: string]: string | number
+}
+
+// Skeleton Loading Component
+function SkeletonCard() {
+  return (
+    <div className="rounded-xl border border-slate-800 bg-slate-900/50 p-6 animate-pulse">
+      <div className="flex items-center justify-between">
+        <div className="space-y-3">
+          <div className="h-4 w-20 bg-slate-700 rounded" />
+          <div className="h-8 w-16 bg-slate-700 rounded" />
+        </div>
+        <div className="h-12 w-12 bg-slate-700 rounded-lg" />
+      </div>
+    </div>
+  )
+}
+
+const SKELETON_HEIGHTS = ['45%', '70%', '55%', '80%', '40%', '65%']
+
+function SkeletonChart() {
+  return (
+    <div className="rounded-xl border border-slate-800 bg-slate-900/50 p-6 animate-pulse">
+      <div className="h-6 w-48 bg-slate-700 rounded mb-6" />
+      <div className="h-[300px] bg-slate-800/50 rounded-lg flex items-end justify-around px-4 pb-4">
+        {SKELETON_HEIGHTS.map((height, i) => (
+          <div
+            key={i}
+            className="w-12 bg-slate-700 rounded-t"
+            style={{ height }}
+          />
+        ))}
+      </div>
+    </div>
+  )
 }
 
 export default function DashboardPage() {
@@ -39,10 +80,19 @@ export default function DashboardPage() {
   })
   const [chartData, setChartData] = useState<ChartData[]>([])
   const [loading, setLoading] = useState(true)
+  const [animateProgress, setAnimateProgress] = useState(false)
 
   useEffect(() => {
     loadStats()
   }, [])
+
+  // Trigger progress bar animation after data loads
+  useEffect(() => {
+    if (!loading) {
+      const timer = setTimeout(() => setAnimateProgress(true), 100)
+      return () => clearTimeout(timer)
+    }
+  }, [loading])
 
   async function loadStats() {
     try {
@@ -91,23 +141,23 @@ export default function DashboardPage() {
         })
 
         // Initialiser les données du graphique
-        const data = last6Months.map(m => {
+        const data: ChartData[] = last6Months.map(m => {
           const entry: ChartData = { name: m.label }
-          agences.forEach((a: any) => entry[a.nom] = 0)
+          agences.forEach((a: { nom: string }) => entry[a.nom] = 0)
           return { ...entry, monthKey: m.monthKey }
         })
 
         // Remplir avec les compteurs
-        devis.forEach((d: any) => {
+        devis.forEach((d: DashboardDevis) => {
           if (!d.date_reception || !d.agence_id) return
           const devisMonth = d.date_reception.slice(0, 7)
           const dataEntry = data.find(entry => entry['monthKey'] === devisMonth)
 
           if (dataEntry) {
-            const agence = agences.find((a: any) => a.id === d.agence_id)
+            const agence = agences.find((a: { id: number }) => a.id === d.agence_id)
             if (agence) {
-              const currentVal = (dataEntry as any)[agence.nom] as number
-              (dataEntry as any)[agence.nom] = currentVal + 1
+              const currentVal = dataEntry[agence.nom] as number
+              dataEntry[agence.nom] = currentVal + 1
             }
           }
         })
@@ -127,24 +177,32 @@ export default function DashboardPage() {
       value: stats.totalDevis,
       icon: FileText,
       color: 'bg-blue-500',
+      borderColor: 'border-l-blue-500',
+      glowColor: 'hover:shadow-blue-500/20',
     },
     {
       title: 'En attente',
       value: stats.devisEnAttente,
       icon: Clock,
       color: 'bg-orange-500',
+      borderColor: 'border-l-orange-500',
+      glowColor: 'hover:shadow-orange-500/20',
     },
     {
       title: 'Acceptés',
       value: stats.devisAcceptes,
       icon: TrendingUp,
       color: 'bg-green-500',
+      borderColor: 'border-l-green-500',
+      glowColor: 'hover:shadow-green-500/20',
     },
     {
       title: 'Clients',
       value: stats.totalClients,
       icon: Users,
       color: 'bg-purple-500',
+      borderColor: 'border-l-purple-500',
+      glowColor: 'hover:shadow-purple-500/20',
     },
   ]
 
@@ -153,34 +211,75 @@ export default function DashboardPage() {
 
   if (loading) {
     return (
-      <div className="flex h-screen items-center justify-center">
-        <div className="text-slate-600">Chargement...</div>
+      <div className="p-8">
+        <div className="mb-8">
+          <div className="h-9 w-48 bg-slate-700 rounded animate-pulse" />
+          <div className="mt-3 h-5 w-64 bg-slate-800 rounded animate-pulse" />
+        </div>
+
+        {/* Skeleton KPIs */}
+        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+          {[...Array(4)].map((_, i) => (
+            <SkeletonCard key={i} />
+          ))}
+        </div>
+
+        <div className="grid grid-cols-1 gap-6 lg:grid-cols-2 mt-6">
+          <div className="rounded-xl border border-slate-800 bg-slate-900/50 p-6 animate-pulse">
+            <div className="h-6 w-40 bg-slate-700 rounded mb-4" />
+            <div className="h-10 w-24 bg-slate-700 rounded mb-4" />
+            <div className="h-3 bg-slate-800 rounded-full" />
+          </div>
+          <div className="rounded-xl border border-slate-800 bg-slate-900/50 p-6 animate-pulse">
+            <div className="h-6 w-40 bg-slate-700 rounded mb-4" />
+            <div className="space-y-4">
+              {[...Array(3)].map((_, i) => (
+                <div key={i} className="flex justify-between">
+                  <div className="h-4 w-20 bg-slate-700 rounded" />
+                  <div className="h-4 w-8 bg-slate-700 rounded" />
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        <div className="mt-6">
+          <SkeletonChart />
+        </div>
       </div>
     )
   }
 
   return (
     <div className="p-8">
-      <div className="mb-8">
+      <div className="mb-8 animate-in fade-in slide-in-from-top-4 duration-500">
         <h1 className="text-3xl font-bold text-white">Tableau de bord</h1>
         <p className="mt-2 text-slate-400">Vue d&apos;ensemble de ton activité</p>
       </div>
 
-      {/* KPIs */}
+      {/* KPIs with staggered animation */}
       <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
-        {cards.map((card) => {
+        {cards.map((card, index) => {
           const Icon = card.icon
           return (
             <div
               key={card.title}
-              className="rounded-lg border border-slate-800 bg-slate-900 p-6 shadow-sm"
+              className={`
+                rounded-xl border border-slate-800 border-l-4 ${card.borderColor}
+                bg-slate-900/80 backdrop-blur-sm p-6
+                shadow-lg ${card.glowColor} hover:shadow-xl
+                transform hover:scale-[1.02] hover:-translate-y-1
+                transition-all duration-300 ease-out
+                animate-in fade-in slide-in-from-bottom-4
+              `}
+              style={{ animationDelay: `${index * 100}ms`, animationFillMode: 'backwards' }}
             >
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm font-medium text-slate-400">{card.title}</p>
                   <p className="mt-2 text-3xl font-bold text-white">{card.value}</p>
                 </div>
-                <div className={`rounded-lg ${card.color} p-3`}>
+                <div className={`rounded-xl ${card.color} p-3 shadow-lg`}>
                   <Icon className="h-6 w-6 text-white" />
                 </div>
               </div>
@@ -191,34 +290,54 @@ export default function DashboardPage() {
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-2 mt-6">
         {/* Taux de conversion */}
-        <div className="rounded-lg border border-slate-800 bg-slate-900 p-6 shadow-sm">
+        <div
+          className="rounded-xl border border-slate-800 bg-slate-900/80 backdrop-blur-sm p-6 shadow-lg
+                     hover:shadow-xl transition-shadow duration-300
+                     animate-in fade-in slide-in-from-left-4 duration-500"
+          style={{ animationDelay: '400ms', animationFillMode: 'backwards' }}
+        >
           <h2 className="text-lg font-semibold text-white">Taux de conversion</h2>
           <div className="mt-4 flex items-end gap-2">
             <span className="text-4xl font-bold text-orange-500">{stats.tauxConversion}%</span>
             <span className="mb-2 text-sm text-slate-400">des devis sont acceptés</span>
           </div>
-          <div className="mt-4 h-2 overflow-hidden rounded-full bg-slate-800">
+          <div className="mt-4 h-3 overflow-hidden rounded-full bg-slate-800">
             <div
-              className="h-full bg-orange-500 transition-all"
-              style={{ width: `${stats.tauxConversion}%` }}
+              className="h-full bg-gradient-to-r from-orange-500 to-amber-400 rounded-full
+                         transition-all duration-1000 ease-out"
+              style={{ width: animateProgress ? `${stats.tauxConversion}%` : '0%' }}
             />
           </div>
         </div>
 
         {/* Répartition par statut */}
-        <div className="rounded-lg border border-slate-800 bg-slate-900 p-6 shadow-sm">
+        <div
+          className="rounded-xl border border-slate-800 bg-slate-900/80 backdrop-blur-sm p-6 shadow-lg
+                     hover:shadow-xl transition-shadow duration-300
+                     animate-in fade-in slide-in-from-right-4 duration-500"
+          style={{ animationDelay: '500ms', animationFillMode: 'backwards' }}
+        >
           <h2 className="text-lg font-semibold text-white">Répartition des devis</h2>
-          <div className="mt-4 space-y-3">
-            <div className="flex items-center justify-between">
-              <span className="text-sm text-slate-400">En attente</span>
+          <div className="mt-4 space-y-4">
+            <div className="flex items-center justify-between group">
+              <div className="flex items-center gap-2">
+                <div className="w-2 h-2 rounded-full bg-orange-500" />
+                <span className="text-sm text-slate-400 group-hover:text-slate-300 transition-colors">En attente</span>
+              </div>
               <span className="font-medium text-white">{stats.devisEnAttente}</span>
             </div>
-            <div className="flex items-center justify-between">
-              <span className="text-sm text-slate-400">Envoyés</span>
+            <div className="flex items-center justify-between group">
+              <div className="flex items-center gap-2">
+                <div className="w-2 h-2 rounded-full bg-blue-500" />
+                <span className="text-sm text-slate-400 group-hover:text-slate-300 transition-colors">Envoyés</span>
+              </div>
               <span className="font-medium text-white">{stats.devisEnvoyes}</span>
             </div>
-            <div className="flex items-center justify-between">
-              <span className="text-sm text-slate-400">Acceptés</span>
+            <div className="flex items-center justify-between group">
+              <div className="flex items-center gap-2">
+                <div className="w-2 h-2 rounded-full bg-green-500" />
+                <span className="text-sm text-slate-400 group-hover:text-slate-300 transition-colors">Acceptés</span>
+              </div>
               <span className="font-medium text-green-500">{stats.devisAcceptes}</span>
             </div>
           </div>
@@ -226,7 +345,12 @@ export default function DashboardPage() {
       </div>
 
       {/* Graphique Évolution par Agence */}
-      <div className="mt-6 rounded-lg border border-slate-800 bg-slate-900 p-6 shadow-sm">
+      <div
+        className="mt-6 rounded-xl border border-slate-800 bg-slate-900/80 backdrop-blur-sm p-6 shadow-lg
+                   hover:shadow-xl transition-shadow duration-300
+                   animate-in fade-in slide-in-from-bottom-4 duration-500"
+        style={{ animationDelay: '600ms', animationFillMode: 'backwards' }}
+      >
         <h2 className="mb-6 text-lg font-semibold text-white">Évolution des devis par agence</h2>
         <div className="h-[300px] w-full">
           <ResponsiveContainer width="100%" height="100%">
@@ -247,7 +371,13 @@ export default function DashboardPage() {
                 tickFormatter={(value) => `${value}`}
               />
               <Tooltip
-                contentStyle={{ backgroundColor: '#1e293b', borderColor: '#334155', color: '#f8fafc' }}
+                contentStyle={{
+                  backgroundColor: '#1e293b',
+                  borderColor: '#334155',
+                  borderRadius: '12px',
+                  color: '#f8fafc',
+                  boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.3)'
+                }}
                 itemStyle={{ color: '#f8fafc' }}
                 cursor={{ fill: 'rgba(51, 65, 85, 0.4)' }}
               />
@@ -259,7 +389,7 @@ export default function DashboardPage() {
                     key={key}
                     dataKey={key}
                     fill={COLORS[index % COLORS.length]}
-                    radius={[4, 4, 0, 0]}
+                    radius={[6, 6, 0, 0]}
                   />
                 ))}
             </BarChart>

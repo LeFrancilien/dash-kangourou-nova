@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
-import { getDevis, Agence, Devis } from '@/lib/supabase'
+import { getDevis, Agence } from '@/lib/supabase'
 import { supabase } from '@/lib/supabase'
 import { Card, CardContent } from '@/components/ui/card'
 import { NouveauDevisDialog } from '@/components/nouveau-devis-dialog'
@@ -12,11 +12,11 @@ import {
     Search,
     Calendar,
     MapPin,
-    Euro,
     Clock,
     CheckCircle2,
     XCircle,
-    Plus
+    Plus,
+    ArrowRight
 } from 'lucide-react'
 
 export default function DevisPage() {
